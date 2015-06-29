@@ -143,9 +143,31 @@ public class ChatAnnotation {
 		}
 	}
 
+	private static void sedMessage(Session session, String msg,
+			String nickname, String room, ChatAnnotation client) {
+		try {
+			synchronized (client) {
+				client.session.getBasicRemote().sendText(msg);
+			}
+		} catch (IOException e) {
+			log.log(Level.WARNING,
+					"Chat Error: Failed to send message to client", e);
+			connections.remove(client);
+			try {
+				client.session.close();
+			} catch (IOException e1) {
+				// Ignore
+			}
+			String message = String.format("%s %s %s %s %s %s %s %s", "{",
+					"\"command\":", "\"finalizeCanvasSlave\",", "\"room\":\"",
+					room.trim(), "\",\"canvasID\":\"", client.nickname, "\"}");
+			broadcast(session, message, nickname, false);
+		}
+	}
+
 	private static void firstMessageToOwn(ChatAnnotation client) {
 		String room = (String) client.session.getUserProperties().get("room");
-		//client.session.getUserProperties().put("room", room);
+		// client.session.getUserProperties().put("room", room);
 		String message = String.format("%s %s %s %s %s %s %s %s", "{",
 				"\"command\":", "\"setMySlaveID\",", "\"room\":\"",
 				room.trim(), "\",\"canvasID\":\"", client.nickname, "\"}");
