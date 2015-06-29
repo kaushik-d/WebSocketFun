@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Start Collaboration Now</title>
+<link rel="stylesheet" type="text/css" href="index.css?v=1.0">
+</head>
+<body>
+	<div id="Start_Message_Area" style="height: 50px"></div>
+	<div id="Start_div">
+		<button onmouseover="StartMessage(this)"
+			onmouseout="ClearStartMessage(this)" onclick="Start(this)">Start</button>
+	</div>
+	<div id="Start_Action_Area"></div>
+
+	<div id="Share_Message_Area" style="height: 50px"></div>
+	<div id="Share_div">
+		<button onmouseover="ShareMessage(this)"
+			onmouseout="ClearShareMessage(this)">Share</button>
+	</div>
+	<div id="Share_Action_Area"></div>
+
+
+	<div id="Join_Message_Area" style="height: 50px"></div>
+	<div id="Share_div">
+		<button onmouseover="JoinMessage(this)"
+			onmouseout="ClearJoinMessage(this)" onclick="Join(this)">Join</button>
+	</div>
+	<div id="Join_Action_Area"></div>
+
+	<script>
+		var startClicked = false;
+		var meetingRoomData = {};
+		var isRoomCreated = false;
+
+		function StartMessage(startButton) {
+			var startMessageArea = document
+					.getElementById("Start_Message_Area");
+			startMessageArea.innerHTML = "Start a meeting";
+		}
+
+		function Start(startButton) {
+			if (!startClicked) {
+				var startActionArea = document
+						.getElementById("Start_Action_Area");
+
+				var BoardInputArea = document.createElement("BoardInputArea");
+				BoardInputArea.setAttribute("id", "BoardInputArea");
+				startActionArea.appendChild(BoardInputArea);
+
+				var nameInput = document.createElement("INPUT");
+				nameInput.setAttribute("type", "text");
+				nameInput.setAttribute("placeholder", "Name");
+				nameInput.setAttribute("id", "nameInput");
+				BoardInputArea.appendChild(nameInput);
+
+				var topicInput = document.createElement("INPUT");
+				topicInput.setAttribute("type", "text");
+				topicInput.setAttribute("placeholder", "Meeting topic");
+				topicInput.setAttribute("id", "topicInput");
+				BoardInputArea.appendChild(topicInput);
+
+				var submitInput = document.createElement("INPUT");
+				submitInput.setAttribute("type", "submit");
+				submitInput.appendChild(document.createTextNode("Submit"));
+				submitInput.setAttribute("id", "submitInput");
+				BoardInputArea.appendChild(submitInput);
+
+				submitInput.onclick = function() {
+					var nameEntered = nameInput.value;
+					var topicEntered = topicInput.value;
+					var dontSend = false;
+					if (nameEntered === "") {
+						nameInput.style = "color:red";
+						dontSend = true;
+					}
+					if (topicEntered === "") {
+						topicInput.style = "color:red";
+						dontSend = true;
+					}
+					if (!dontSend) {
+						xmlhttp = new XMLHttpRequest();
+						xmlhttp.onreadystatechange = function() {
+							if (xmlhttp.readyState == 4
+									&& xmlhttp.status == 200) {
+								meetingRoomData = JSON.parse(xmlhttp.responseText);
+								isRoomCreated = true;
+								document.getElementById("Start_Action_Area").innerHTML = '';
+								document.getElementById("Share_Message_Area").innerHTML = "Meeting room# "
+										+ meetingRoomData.roomNumber;
+								document.getElementById("Join_Message_Area").innerHTML = "Meeting room# "
+										+ meetingRoomData.roomNumber;
+								startClicked = false;
+							}
+						}
+						xmlhttp.open("POST", "login", true);
+						var params = "data="
+								+ encodeURIComponent(JSON.stringify({
+									functName : "createRoom",
+									isPresentation : false,
+									name : nameEntered,
+									topic : topicEntered
+								}));
+						xmlhttp.setRequestHeader("Content-type",
+								"application/x-www-form-urlencoded");
+						xmlhttp.send(params);
+					}
+				};
+
+				var submitCancel = document.createElement("BUTTON");
+				submitCancel.setAttribute("name", "Cancel");
+				submitCancel.appendChild(document.createTextNode("Cancel"));
+				submitCancel.setAttribute("id", "submitCancel");
+				BoardInputArea.appendChild(submitCancel);
+				submitCancel.onclick = function() {
+					document.getElementById("Start_Action_Area").innerHTML = '';
+					startClicked = false;
+				};
+
+				startClicked = true;
+			}
+		}
+
+		function startclicked() {
+			alert();
+		}
+
+		function ClearStartMessage(element) {
+			var MessageArea = document.getElementById("Start_Message_Area");
+			clear(MessageArea);
+		}
+
+		function ShareMessage(startButton) {
+			if (!isRoomCreated) {
+				var MessageArea = document.getElementById("Share_Message_Area");
+				MessageArea.innerHTML = "Share your meeting room.";
+			}
+		}
+
+		function ClearShareMessage(element) {
+			var MessageArea = document.getElementById("Share_Message_Area");
+			clear(MessageArea);
+		}
+
+		function JoinMessage(startButton) {
+			if (!isRoomCreated) {
+				var MessageArea = document.getElementById("Join_Message_Area");
+				MessageArea.innerHTML = "Join an exsisting meeting.<br>You will need a meeting room number.";
+			}
+		}
+
+		function ClearJoinMessage(element) {
+			var MessageArea = document.getElementById("Join_Message_Area");
+			clear(MessageArea);
+		}
+
+		function Join(joinButton) {
+			if (isRoomCreated) {
+				xmlhttp = new XMLHttpRequest();
+				xmlhttp.onreadystatechange = function() {
+					if (xmlhttp.readyState == 4
+							&& xmlhttp.status == 200) {
+						window.location = xmlhttp.responseText;
+						isRoomCreated = false;
+						startClicked = true;
+					}
+				}
+				xmlhttp.open("POST", "login", true);
+				var params = "data="
+						+ encodeURIComponent(JSON.stringify({
+							functName : "joinMeeting",
+							isPresentation : false,
+							name : meetingRoomData.name,
+							topic : meetingRoomData.topic,
+							roomNumber : meetingRoomData.roomNumber
+						}));
+				xmlhttp.setRequestHeader("Content-type",
+						"application/x-www-form-urlencoded");
+				xmlhttp.send(params);
+			}
+		}
+
+		function clear(element) {
+			element.innerHTML = "";
+		}
+
+		//  =======================================
+
+		window
+				.addEventListener(
+						'load',
+						function(e) {
+							window.applicationCache
+									.addEventListener(
+											'updateready',
+											function(e) {
+												if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
+													// Browser downloaded a new app cache.
+													// Swap it in and reload the page to get the new hotness.
+													window.applicationCache
+															.swapCache();
+													// if (confirm('A new version of this site is available. Load it?')) {
+													window.location.reload();
+													// }
+												} else {
+													// Manifest didn't changed. Nothing new to server.
+												}
+											}, false);
+
+						}, false);
+	</script>
+
+</body>
+
+
+</html>

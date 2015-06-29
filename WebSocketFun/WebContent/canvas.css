@@ -1,0 +1,72 @@
+
+body {
+	margin: 0px;
+	padding: 0px;
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+input#chat {
+	width: 410px;
+	position: relative;
+}
+
+#console-container {
+	width: 400px;
+	position: relative;
+	margin-left: auto;
+    margin-right: auto;
+}
+
+#console {
+	border: 1px solid #CCCCCC;
+	border-right-color: #999999;
+	border-bottom-color: #999999;
+	height: 170px;
+	overflow-y: scroll;
+	padding: 5px;
+	width: 100%;
+	position: relative;
+}
+
+#console p {
+	padding: 0;
+	margin: 0;
+	position: relative;
+}
+
+#canvasDiv {
+	position: relative;
+	width: 600px;
+	height: 300px;
+	position: relative;
+	border: 1px solid;
+	margin-left: auto;
+    margin-right: auto;
+}
+#messageDiv {
+	position: relative;
+	position: relative;
+	border: 1px solid;
+	margin-left: auto;
+    margin-right: auto;
+    width: 400px;
+}
+#chatArea {
+	margin-left: auto;
+    margin-right: auto;
+    position: relative;
+}
+
+p{
+	width: 400px;
+	margin-left: auto;
+    margin-right: auto;
+}
+
+canvas {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}

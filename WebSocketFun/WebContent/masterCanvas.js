@@ -1,0 +1,108 @@
+/**
+ * 
+ */
+
+var canvasListMaster = new Array();
+var contextListMaster = new Array();
+var lineStartedListMaster = new Array();
+var oldxListMaster = new Array();
+var oldyListMaster = new Array();
+
+function drawLinesMaster(ID, type, x, y) {
+	contextListMaster[ID].beginPath();
+	if (type === "lineStart") {
+		oldxListMaster[ID] = x;
+		oldyListMaster[ID] = y;
+		lineStartedListMaster[ID] = true;
+	} else if (type === "lineUpdate" && lineStartedListMaster[ID]) {
+		contextListMaster[ID].moveTo(oldxListMaster[ID], oldyListMaster[ID]);
+		contextListMaster[ID].lineTo(x, y);
+		oldxListMaster[ID] = x;
+		oldyListMaster[ID] = y;
+		contextListMaster[ID].stroke();
+	} else {
+		lineStartedListMaster[ID] = false;
+	}
+}
+
+function updateLine(evt) {
+	evt.preventDefault();
+	var ID = parseInt((this.id)[1]);
+	var mousePos = getMousePos(canvasListMaster[ID], evt);
+	Chat.socket.send(JSON.stringify({
+		command : "drawLinesSlave",
+		type : "lineUpdate",
+		x : mousePos.x,
+		y : mousePos.y,
+		slaveID : mySlaveID,
+		pageNum : myCurrentPage
+	}));
+	drawLinesMaster(ID, "lineUpdate", mousePos.x, mousePos.y);
+}
+
+function startLine(evt) {
+	evt.preventDefault();
+	var ID = parseInt((this.id)[1]);
+	var mousePos = getMousePos(canvasListMaster[ID], evt);
+	Chat.socket.send(JSON.stringify({
+		command : "drawLinesSlave",
+		type : "lineStart",
+		x : mousePos.x,
+		y : mousePos.y,
+		slaveID : mySlaveID
+	}));
+	drawLinesMaster(ID, "lineStart", mousePos.x, mousePos.y);
+	canvasListMaster[ID].addEventListener('mousemove', updateLine, false);
+	canvasListMaster[ID].addEventListener('mousemove', updateMousePosition,
+			false);
+	canvasListMaster[ID].addEventListener('touchmove', updateLine, false);
+	canvasListMaster[ID].addEventListener('touchmove', updateMousePosition,
+			false);
+}
+
+function endLine(evt) {
+	evt.preventDefault();
+	var ID = parseInt((this.id)[1]);
+	var mousePos = getMousePos(canvasListMaster[ID], evt);
+	Chat.socket.send(JSON.stringify({
+		command : "drawLinesSlave",
+		type : "lineEnd",
+		x : mousePos.x,
+		y : mousePos.y,
+		slaveID : mySlaveID
+	}));
+	drawLinesMaster(ID, "lineEnd", mousePos.x, mousePos.y);
+	canvasListMaster[ID].removeEventListener('mousemove', updateLine, false);
+	canvasListMaster[ID].removeEventListener('mousemove', updateMousePosition,
+			false);
+	canvasListMaster[ID].removeEventListener('touchmove', updateLine, false);
+	canvasListMaster[ID].removeEventListener('touchmove', updateMousePosition,
+			false);
+}
+
+function initCanvasMaster(canvasName) {
+	var ID = parseInt(canvasName.substring(1, canvasName.length));
+	var canvasDiv = window.document.getElementById('canvasDiv');
+	canvasListMaster[ID] = document.createElement('canvas');
+	canvasListMaster[ID].id = canvasName;
+	canvasListMaster[ID].width = 600;
+	canvasListMaster[ID].height = 300;
+	//canvasListMaster[ID].width = parseInt(convasDiv.style.width);
+	//canvasListMaster[ID].height = parseInt(convasDiv.style.height);;
+	canvasListMaster[ID].left = 0;
+	canvasListMaster[ID].right = 0;
+	canvasListMaster[ID].style.zIndex = 0;
+	//canvasListMaster[ID].style.position = "absolute";
+	//canvasListMaster[ID].style.border = "1px solid";
+	canvasDiv.appendChild(canvasListMaster[ID]);
+	contextListMaster[ID] = canvasListMaster[ID].getContext('2d');
+	lineStartedListMaster[ID] = false;
+	oldxListMaster[ID] = 0;
+	oldyListMaster[ID] = 0;
+	canvasListMaster[ID].addEventListener('mousedown', startLine, false);
+	canvasListMaster[ID].addEventListener('mouseup', endLine, false);
+	canvasListMaster[ID].addEventListener('mouseout', endLine, false);
+	canvasListMaster[ID].addEventListener('touchstart', startLine, false);
+	canvasListMaster[ID].addEventListener('touchleave', endLine, false);
+	canvasListMaster[ID].addEventListener('touchend', endLine, false);
+}

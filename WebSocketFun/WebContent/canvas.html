@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+<link rel="stylesheet" type="text/css" href="canvas.css">
+</head>
+
+<body>
+	<div id="canvasDiv"></div>
+	<div id="messageDiv">
+		<p id="message">Mouse position:</p>
+	</div>
+	<div id="chatArea">
+		<p>
+			<input type="text" placeholder="type and press enter to chat"
+				id="chat" />
+		</p>
+		<div id="console-container">
+			<div id="console"></div>
+		</div>
+	</div>
+	<script src="utility.js"></script>
+	<script src="masterCanvas.js"></script>
+	<script src="slaveCanvas.js"></script>
+	<script src="chat.js"></script>
+	<script>
+		var mySlaveID = -1;
+		var myCurrentPage = 0;
+		var savedDrawCommands = Array();
+
+		initCanvasMaster("M0");
+
+		Chat.initialize();
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,46 @@
+body {
+	position: relative;
+}
+
+div {
+	text-align: center;
+	vertical-align: bottom;
+	width: 800px;
+	height: 50px;
+	padding: 0px;
+	width: 100%;
+	margin: 0;
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+}
+#Start_div {
+	height: 20px;
+}
+button {
+	position: relative;
+}
+
+#Start_Action_Area {
+	width: 200px;
+	height: 65px;
+	/*position: fixed;*/
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#BoardInputArea {
+	width: 200px;
+	/*position: fixed;*/
+	margin-left: auto;
+	margin-right: auto;
+	zIndex: 1;
+}
+
+#nameInput {
+	width: 100%;
+}
+
+#topicInput {
+	width: 100%;
+}
