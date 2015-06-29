@@ -143,7 +143,7 @@ public class ChatAnnotation {
 		}
 	}
 
-	private static void sedMessage(Session session, String msg,
+	private static void sendMessage(Session session, String msg,
 			String nickname, String room, ChatAnnotation client) {
 		try {
 			synchronized (client) {
