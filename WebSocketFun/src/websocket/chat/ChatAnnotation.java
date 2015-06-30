@@ -46,7 +46,9 @@ public class ChatAnnotation {
 	private EndpointConfig config;
 	private static final String GUEST_PREFIX = "S";
 	private static final AtomicInteger connectionIds = new AtomicInteger(0);
-	private static final Set<ChatAnnotation> connections = new CopyOnWriteArraySet<ChatAnnotation>();
+	// private static final Set<ChatAnnotation> connections = new
+	// CopyOnWriteArraySet<ChatAnnotation>();
+	private static final HashMap<String, CopyOnWriteArraySet<ChatAnnotation>> roomToConnections = new HashMap<String, CopyOnWriteArraySet<ChatAnnotation>>();
 	private Set<String> receivedDrawMessages = new CopyOnWriteArraySet<String>();
 
 	private final String nickname;
@@ -68,7 +70,16 @@ public class ChatAnnotation {
 				.getAttribute("meetingRoomList");
 
 		session.getUserProperties().put("room", room);
-		connections.add(this);
+
+		// connections.add(this);
+		if(!roomToConnections.containsKey(room)) {
+			CopyOnWriteArraySet<ChatAnnotation> connections = new CopyOnWriteArraySet<ChatAnnotation>();
+			connections.add(this);
+			roomToConnections.put(room,connections);
+		} else {
+			roomToConnections.get(room).add(this);
+		}
+
 		String message = String.format("%s %s %s %s %s %s %s %s", "{",
 				"\"command\":", "\"initCanvasSlave\",", "\"room\":\"",
 				room.trim(), "\",\"canvasID\":\"", nickname, "\"}");
@@ -79,7 +90,8 @@ public class ChatAnnotation {
 	@OnClose
 	public void end(final Session session) {
 		String room = (String) session.getUserProperties().get("room");
-		connections.remove(this);
+		// connections.remove(this);
+		roomToConnections.get(room).remove(this);
 		String message = String.format("%s %s %s %s %s %s %s %s", "{",
 				"\"command\":", "\"finalizeCanvasSlave\",", "\"room\":\"",
 				room.trim(), "\",\"canvasID\":\"", nickname, "\"}");
@@ -112,12 +124,14 @@ public class ChatAnnotation {
 	private static void broadcast(Session session, String msg, String nickname,
 			boolean toAllButMe) {
 		String room = (String) session.getUserProperties().get("room");
+		CopyOnWriteArraySet<ChatAnnotation> connections = roomToConnections
+				.get(room);
 		for (ChatAnnotation client : connections) {
-			if (!client.session.isOpen()
-					|| !room.equals(client.session.getUserProperties().get(
-							"room"))) {
-				continue;
-			}
+			//if (!client.session.isOpen()
+			//		|| !room.equals(client.session.getUserProperties().get(
+			//				"room"))) {
+			//	continue;
+			//}
 			if (toAllButMe && nickname == client.nickname) {
 				continue;
 			}
@@ -152,6 +166,8 @@ public class ChatAnnotation {
 		} catch (IOException e) {
 			log.log(Level.WARNING,
 					"Chat Error: Failed to send message to client", e);
+			CopyOnWriteArraySet<ChatAnnotation> connections = roomToConnections
+					.get(room);
 			connections.remove(client);
 			try {
 				client.session.close();
@@ -167,7 +183,8 @@ public class ChatAnnotation {
 
 	private static void firstMessageToOwn(ChatAnnotation client) {
 		String room = (String) client.session.getUserProperties().get("room");
-		// client.session.getUserProperties().put("room", room);
+		CopyOnWriteArraySet<ChatAnnotation> connections = roomToConnections
+				.get(room);
 		String message = String.format("%s %s %s %s %s %s %s %s", "{",
 				"\"command\":", "\"setMySlaveID\",", "\"room\":\"",
 				room.trim(), "\",\"canvasID\":\"", client.nickname, "\"}");
