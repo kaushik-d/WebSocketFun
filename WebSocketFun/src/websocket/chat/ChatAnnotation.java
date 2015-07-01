@@ -46,8 +46,6 @@ public class ChatAnnotation {
 	private EndpointConfig config;
 	private static final String GUEST_PREFIX = "S";
 	private static final AtomicInteger connectionIds = new AtomicInteger(0);
-	// private static final Set<ChatAnnotation> connections = new
-	// CopyOnWriteArraySet<ChatAnnotation>();
 	private static final HashMap<String, CopyOnWriteArraySet<ChatAnnotation>> roomToConnections = new HashMap<String, CopyOnWriteArraySet<ChatAnnotation>>();
 	private Set<String> receivedDrawMessages = new CopyOnWriteArraySet<String>();
 
