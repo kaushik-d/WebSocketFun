@@ -47,6 +47,7 @@ public class ChatAnnotation {
 	private static final String GUEST_PREFIX = "S";
 	private static final AtomicInteger connectionIds = new AtomicInteger(0);
 	private static final HashMap<String, CopyOnWriteArraySet<ChatAnnotation>> roomToConnections = new HashMap<String, CopyOnWriteArraySet<ChatAnnotation>>();
+	
 	private Set<String> receivedDrawMessages = new CopyOnWriteArraySet<String>();
 
 	private final String nickname;
@@ -69,7 +70,6 @@ public class ChatAnnotation {
 
 		session.getUserProperties().put("room", room);
 
-		// connections.add(this);
 		if(!roomToConnections.containsKey(room)) {
 			CopyOnWriteArraySet<ChatAnnotation> connections = new CopyOnWriteArraySet<ChatAnnotation>();
 			connections.add(this);
@@ -124,39 +124,19 @@ public class ChatAnnotation {
 		String room = (String) session.getUserProperties().get("room");
 		CopyOnWriteArraySet<ChatAnnotation> connections = roomToConnections
 				.get(room);
+		
 		for (ChatAnnotation client : connections) {
-			//if (!client.session.isOpen()
-			//		|| !room.equals(client.session.getUserProperties().get(
-			//				"room"))) {
-			//	continue;
-			//}
+			
 			if (toAllButMe && nickname == client.nickname) {
 				continue;
 			}
-			try {
-				synchronized (client) {
-					client.session.getBasicRemote().sendText(msg);
-				}
-			} catch (IOException e) {
-				log.log(Level.WARNING,
-						"Chat Error: Failed to send message to client", e);
-				connections.remove(client);
-				try {
-					client.session.close();
-				} catch (IOException e1) {
-					// Ignore
-				}
-				String message = String.format("%s %s %s %s %s %s %s %s", "{",
-						"\"command\":", "\"finalizeCanvasSlave\",",
-						"\"room\":\"", room.trim(), "\",\"canvasID\":\"",
-						client.nickname, "\"}");
-				broadcast(session, message, nickname, false);
-			}
+			sendMessage(session, msg, nickname, room, client);
 		}
 	}
 
 	private static void sendMessage(Session session, String msg,
 			String nickname, String room, ChatAnnotation client) {
+		
 		try {
 			synchronized (client) {
 				client.session.getBasicRemote().sendText(msg);
@@ -231,8 +211,10 @@ public class ChatAnnotation {
 							client.nickname, "\"}");
 					broadcast(client.session, msg, client.nickname, false);
 				}
+				
 				// Send the other client's draw commands to this new client
 				for (String command : otherclient.receivedDrawMessages) {
+					
 					try {
 						synchronized (client) {
 							client.session.getBasicRemote().sendText(command);
