@@ -35,6 +35,10 @@ import javax.websocket.server.ServerEndpoint;
 
 //import util.HTMLFilter;
 
+
+
+import com.google.gson.Gson;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,7 +51,7 @@ public class ChatAnnotation {
 	private static final String GUEST_PREFIX = "S";
 	private static final AtomicInteger connectionIds = new AtomicInteger(0);
 	private static final HashMap<String, CopyOnWriteArraySet<ChatAnnotation>> roomToConnections = new HashMap<String, CopyOnWriteArraySet<ChatAnnotation>>();
-	
+
 	private Set<String> receivedDrawMessages = new CopyOnWriteArraySet<String>();
 
 	private final String nickname;
@@ -68,19 +72,40 @@ public class ChatAnnotation {
 		HashMap<String, meetingRoomData> meetingRooms = (HashMap<String, meetingRoomData>) servletContext
 				.getAttribute("meetingRoomList");
 
+		meetingRoomData MeetingRoomData = null;
+		if (meetingRooms.containsKey(room)) {
+			MeetingRoomData = meetingRooms.get(room);
+		} else {
+			try {
+				session.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		session.getUserProperties().put("room", room);
 
-		if(!roomToConnections.containsKey(room)) {
+		if (!roomToConnections.containsKey(room)) {
 			CopyOnWriteArraySet<ChatAnnotation> connections = new CopyOnWriteArraySet<ChatAnnotation>();
 			connections.add(this);
-			roomToConnections.put(room,connections);
+			roomToConnections.put(room, connections);
 		} else {
 			roomToConnections.get(room).add(this);
 		}
 
-		String message = String.format("%s %s %s %s %s %s %s %s", "{",
-				"\"command\":", "\"initCanvasSlave\",", "\"room\":\"",
-				room.trim(), "\",\"canvasID\":\"", nickname, "\"}");
+		//String message = String.format("%s %s %s %s %s %s %s %s", "{",
+		//		"\"command\":", "\"initCanvasSlave\",", "\"room\":\"",
+		//		room.trim(), "\",\"canvasID\":\"", nickname, "\"}");
+
+		commandToClient CommandToClient = new commandToClient(
+				"initCanvasSlave", room.trim(), nickname,
+				MeetingRoomData.getisPresentation(),
+				MeetingRoomData.getPresentationURI());
+		
+		Gson gson = new Gson();
+		String message = gson.toJson(CommandToClient, commandToClient.class);
+		
 		broadcast(session, message, nickname, true);
 		firstMessageToOwn(this, session, nickname);
 	}
@@ -90,7 +115,7 @@ public class ChatAnnotation {
 		String room = (String) session.getUserProperties().get("room");
 
 		roomToConnections.get(room).remove(this);
-		
+
 		String message = String.format("%s %s %s %s %s %s %s %s", "{",
 				"\"command\":", "\"finalizeCanvasSlave\",", "\"room\":\"",
 				room.trim(), "\",\"canvasID\":\"", nickname, "\"}");
@@ -125,9 +150,9 @@ public class ChatAnnotation {
 		String room = (String) session.getUserProperties().get("room");
 		CopyOnWriteArraySet<ChatAnnotation> connections = roomToConnections
 				.get(room);
-		
+
 		for (ChatAnnotation client : connections) {
-			
+
 			if (toAllButMe && nickname == client.nickname) {
 				continue;
 			}
@@ -137,7 +162,7 @@ public class ChatAnnotation {
 
 	private static void sendMessage(Session session, String msg,
 			String nickname, String room, ChatAnnotation client) {
-				
+
 		try {
 			synchronized (client) {
 				client.session.getBasicRemote().sendText(msg);
@@ -160,15 +185,17 @@ public class ChatAnnotation {
 		}
 	}
 
-	private static void firstMessageToOwn(ChatAnnotation client, Session session, String nickname) {
-		//String room = (String) client.session.getUserProperties().get("room");
+	private static void firstMessageToOwn(ChatAnnotation client,
+			Session session, String nickname) {
+		// String room = (String)
+		// client.session.getUserProperties().get("room");
 		String room = (String) session.getUserProperties().get("room");
 		CopyOnWriteArraySet<ChatAnnotation> connections = roomToConnections
 				.get(room);
 		String message = String.format("%s %s %s %s %s %s %s %s", "{",
 				"\"command\":", "\"setMySlaveID\",", "\"room\":\"",
 				room.trim(), "\",\"canvasID\":\"", client.nickname, "\"}");
-		
+
 		sendMessage(session, message, nickname, room, client);
 
 		for (ChatAnnotation otherclient : connections) {
@@ -178,16 +205,16 @@ public class ChatAnnotation {
 						"{", "\"command\":", "\"initCanvasSlave\",",
 						"\"room\":\"", room.trim(), "\",\"canvasID\":\"",
 						otherclient.nickname, "\"}");
-				
+
 				sendMessage(session, messageOther, nickname, room, client);
-				
+
 				// Send the other client's draw commands to this new client
 				for (String command : otherclient.receivedDrawMessages) {
 					sendMessage(session, command, nickname, room, client);
 				}
 			}
 		}
-		
+
 	}
-	
+
 }
