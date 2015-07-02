@@ -5,6 +5,7 @@ var Chat = {};
 Chat.socket = null;
 
 Chat.connect = (function(host) {
+	
 	if ('WebSocket' in window) {
 		Chat.socket = new WebSocket(host);
 	} else if ('MozWebSocket' in window) {

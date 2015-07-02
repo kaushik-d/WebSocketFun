@@ -30,8 +30,8 @@ function initCanvasSlave(canvasName) {
 	var canvasDiv = window.document.getElementById('canvasDiv');
 	canvasListSlave[ID] = document.createElement('canvas');
 	canvasListSlave[ID].id = canvasName;
-	canvasListSlave[ID].width = 600;
-	canvasListSlave[ID].height = 300;
+	canvasListSlave[ID].width = INITICANVASWIDTH;
+	canvasListSlave[ID].height = INITICANVASHEIGHT;
 	canvasListSlave[ID].left = 0;
 	canvasListSlave[ID].right = 0;
 	canvasListSlave[ID].style.zIndex = -ID-1;

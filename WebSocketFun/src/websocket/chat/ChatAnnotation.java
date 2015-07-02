@@ -56,6 +56,7 @@ public class ChatAnnotation {
 
 	private final String nickname;
 	private Session session;
+	private meetingRoomData MeetingRoomData;
 
 	public ChatAnnotation() {
 		nickname = GUEST_PREFIX + connectionIds.getAndIncrement();
@@ -72,7 +73,8 @@ public class ChatAnnotation {
 		HashMap<String, meetingRoomData> meetingRooms = (HashMap<String, meetingRoomData>) servletContext
 				.getAttribute("meetingRoomList");
 
-		meetingRoomData MeetingRoomData = null;
+		MeetingRoomData = null;
+		
 		if (meetingRooms.containsKey(room)) {
 			MeetingRoomData = meetingRooms.get(room);
 		} else {
@@ -94,10 +96,6 @@ public class ChatAnnotation {
 			roomToConnections.get(room).add(this);
 		}
 
-		//String message = String.format("%s %s %s %s %s %s %s %s", "{",
-		//		"\"command\":", "\"initCanvasSlave\",", "\"room\":\"",
-		//		room.trim(), "\",\"canvasID\":\"", nickname, "\"}");
-
 		commandToClient CommandToClient = new commandToClient(
 				"initCanvasSlave", room.trim(), nickname,
 				MeetingRoomData.getisPresentation(),
@@ -106,8 +104,8 @@ public class ChatAnnotation {
 		Gson gson = new Gson();
 		String message = gson.toJson(CommandToClient, commandToClient.class);
 		
-		broadcast(session, message, nickname, true);
-		firstMessageToOwn(this, session, nickname);
+		broadcast(session, message, nickname, true, MeetingRoomData);
+		firstMessageToOwn(this, session, nickname, MeetingRoomData);
 	}
 
 	@OnClose
@@ -115,11 +113,16 @@ public class ChatAnnotation {
 		String room = (String) session.getUserProperties().get("room");
 
 		roomToConnections.get(room).remove(this);
-
-		String message = String.format("%s %s %s %s %s %s %s %s", "{",
-				"\"command\":", "\"finalizeCanvasSlave\",", "\"room\":\"",
-				room.trim(), "\",\"canvasID\":\"", nickname, "\"}");
-		broadcast(session, message, nickname, false);
+		
+		commandToClient CommandToClient = new commandToClient(
+				"finalizeCanvasSlave", room.trim(), nickname,
+				MeetingRoomData.getisPresentation(),
+				MeetingRoomData.getPresentationURI());
+		
+		Gson gson = new Gson();
+		String message = gson.toJson(CommandToClient, commandToClient.class);
+		
+		broadcast(session, message, nickname, false, MeetingRoomData);
 	}
 
 	@OnMessage
@@ -137,7 +140,7 @@ public class ChatAnnotation {
 		if (filteredMessage.contains("textMessage")) {
 			toAllButMe = false;
 		}
-		broadcast(session, filteredMessage, nickname, toAllButMe);
+		broadcast(session, filteredMessage, nickname, toAllButMe, MeetingRoomData);
 	}
 
 	@OnError
@@ -146,7 +149,7 @@ public class ChatAnnotation {
 	}
 
 	private static void broadcast(Session session, String msg, String nickname,
-			boolean toAllButMe) {
+			boolean toAllButMe, meetingRoomData MeetingRoomData) {
 		String room = (String) session.getUserProperties().get("room");
 		CopyOnWriteArraySet<ChatAnnotation> connections = roomToConnections
 				.get(room);
@@ -156,12 +159,12 @@ public class ChatAnnotation {
 			if (toAllButMe && nickname == client.nickname) {
 				continue;
 			}
-			sendMessage(session, msg, nickname, room, client);
+			sendMessage(session, msg, nickname, room, client, MeetingRoomData);
 		}
 	}
 
 	private static void sendMessage(Session session, String msg,
-			String nickname, String room, ChatAnnotation client) {
+			String nickname, String room, ChatAnnotation client, meetingRoomData MeetingRoomData) {
 
 		try {
 			synchronized (client) {
@@ -178,39 +181,53 @@ public class ChatAnnotation {
 			} catch (IOException e1) {
 				// Ignore
 			}
-			String message = String.format("%s %s %s %s %s %s %s %s", "{",
-					"\"command\":", "\"finalizeCanvasSlave\",", "\"room\":\"",
-					room.trim(), "\",\"canvasID\":\"", client.nickname, "\"}");
-			broadcast(session, message, nickname, false);
+
+			commandToClient CommandToClient = new commandToClient(
+					"finalizeCanvasSlave", room.trim(), nickname,
+					MeetingRoomData.getisPresentation(),
+					MeetingRoomData.getPresentationURI());
+			
+			Gson gson = new Gson();
+			String message = gson.toJson(CommandToClient, commandToClient.class);
+			broadcast(session, message, nickname, false, MeetingRoomData);
 		}
 	}
 
 	private static void firstMessageToOwn(ChatAnnotation client,
-			Session session, String nickname) {
+			Session session, String nickname, meetingRoomData MeetingRoomData) {
 		// String room = (String)
 		// client.session.getUserProperties().get("room");
 		String room = (String) session.getUserProperties().get("room");
 		CopyOnWriteArraySet<ChatAnnotation> connections = roomToConnections
 				.get(room);
-		String message = String.format("%s %s %s %s %s %s %s %s", "{",
-				"\"command\":", "\"setMySlaveID\",", "\"room\":\"",
-				room.trim(), "\",\"canvasID\":\"", client.nickname, "\"}");
+		
+		commandToClient CommandToClient = new commandToClient(
+				"setMySlaveID", room.trim(), client.nickname,
+				MeetingRoomData.getisPresentation(),
+				MeetingRoomData.getPresentationURI());
+		
+		Gson gson = new Gson();
+		String message = gson.toJson(CommandToClient, commandToClient.class);
 
-		sendMessage(session, message, nickname, room, client);
+		sendMessage(session, message, client.nickname, room, client, MeetingRoomData);
 
 		for (ChatAnnotation otherclient : connections) {
 			if (otherclient.nickname != client.nickname) {
 				// Send the other client's canvas to this new client
-				String messageOther = String.format("%s %s %s %s %s %s %s %s",
-						"{", "\"command\":", "\"initCanvasSlave\",",
-						"\"room\":\"", room.trim(), "\",\"canvasID\":\"",
-						otherclient.nickname, "\"}");
+				
+				commandToClient CommandToClient1 = new commandToClient(
+						"initCanvasSlave", room.trim(), otherclient.nickname,
+						MeetingRoomData.getisPresentation(),
+						MeetingRoomData.getPresentationURI());
+				
+				//Gson gson = new Gson();
+				String messageOther = gson.toJson(CommandToClient1, commandToClient.class);
 
-				sendMessage(session, messageOther, nickname, room, client);
+				sendMessage(session, messageOther, nickname, room, client, MeetingRoomData);
 
 				// Send the other client's draw commands to this new client
 				for (String command : otherclient.receivedDrawMessages) {
-					sendMessage(session, command, nickname, room, client);
+					sendMessage(session, command, nickname, room, client, MeetingRoomData);
 				}
 			}
 		}

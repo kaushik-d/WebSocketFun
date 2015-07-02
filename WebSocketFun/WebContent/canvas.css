@@ -38,8 +38,8 @@ input#chat {
 
 #canvasDiv {
 	position: relative;
-	width: 600px;
-	height: 300px;
+	width: 512px;   /* 1024×576 or 16:9 */
+	height: 288px;
 	position: relative;
 	border: 1px solid;
 	margin-left: auto;

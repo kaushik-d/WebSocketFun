@@ -85,8 +85,8 @@ function initCanvasMaster(canvasName) {
 	var canvasDiv = window.document.getElementById('canvasDiv');
 	canvasListMaster[ID] = document.createElement('canvas');
 	canvasListMaster[ID].id = canvasName;
-	canvasListMaster[ID].width = 600;
-	canvasListMaster[ID].height = 300;
+	canvasListMaster[ID].width = INITICANVASWIDTH;
+	canvasListMaster[ID].height = INITICANVASHEIGHT;
 	//canvasListMaster[ID].width = parseInt(convasDiv.style.width);
 	//canvasListMaster[ID].height = parseInt(convasDiv.style.height);;
 	canvasListMaster[ID].left = 0;

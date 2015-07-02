@@ -27,10 +27,14 @@
 	<script src="chat.js"></script>
 	<%String roomNum = (String)request.getParameter("room");%>
 	<script>
+	    var INITICANVASWIDTH = 512;
+	    var INITICANVASHEIGHT = 288;
 		var mySlaveID = -1;
 		var myCurrentPage = 0;
 		var myMeeringRoomNum ="<%=(String)request.getParameter("room")%>";
-		var savedDrawCommands = Array();
+		var savedDrawCommands = {};
+		var isPresentation = false;
+		var presentationURI = "NotAPresentation";
 
 		initCanvasMaster("M0");
 

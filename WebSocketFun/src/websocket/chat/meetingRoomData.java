@@ -51,6 +51,6 @@ public class meetingRoomData {
 	
 	public String getPresentationURI(){
 		if(isPresentation) return  presentationURI;
-		return null;
+		return "NotAPresentation";
 	}
 }
