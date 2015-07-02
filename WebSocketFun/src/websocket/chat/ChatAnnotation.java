@@ -82,14 +82,15 @@ public class ChatAnnotation {
 				"\"command\":", "\"initCanvasSlave\",", "\"room\":\"",
 				room.trim(), "\",\"canvasID\":\"", nickname, "\"}");
 		broadcast(session, message, nickname, true);
-		firstMessageToOwn(this);
+		firstMessageToOwn(this, session, nickname);
 	}
 
 	@OnClose
 	public void end(final Session session) {
 		String room = (String) session.getUserProperties().get("room");
-		// connections.remove(this);
+
 		roomToConnections.get(room).remove(this);
+		
 		String message = String.format("%s %s %s %s %s %s %s %s", "{",
 				"\"command\":", "\"finalizeCanvasSlave\",", "\"room\":\"",
 				room.trim(), "\",\"canvasID\":\"", nickname, "\"}");
@@ -136,7 +137,7 @@ public class ChatAnnotation {
 
 	private static void sendMessage(Session session, String msg,
 			String nickname, String room, ChatAnnotation client) {
-		
+				
 		try {
 			synchronized (client) {
 				client.session.getBasicRemote().sendText(msg);
@@ -159,31 +160,16 @@ public class ChatAnnotation {
 		}
 	}
 
-	private static void firstMessageToOwn(ChatAnnotation client) {
-		String room = (String) client.session.getUserProperties().get("room");
+	private static void firstMessageToOwn(ChatAnnotation client, Session session, String nickname) {
+		//String room = (String) client.session.getUserProperties().get("room");
+		String room = (String) session.getUserProperties().get("room");
 		CopyOnWriteArraySet<ChatAnnotation> connections = roomToConnections
 				.get(room);
 		String message = String.format("%s %s %s %s %s %s %s %s", "{",
 				"\"command\":", "\"setMySlaveID\",", "\"room\":\"",
 				room.trim(), "\",\"canvasID\":\"", client.nickname, "\"}");
-		try {
-			synchronized (client) {
-				client.session.getBasicRemote().sendText(message);
-			}
-		} catch (IOException e) {
-			log.log(Level.WARNING,
-					"Chat Error: Failed to send message to client", e);
-			connections.remove(client);
-			try {
-				client.session.close();
-			} catch (IOException e1) {
-				// Ignore
-			}
-			String msg = String.format("%s %s %s %s %s %s %s %s", "{",
-					"\"command\":", "\"finalizeCanvasSlave\",", "\"room\":\"",
-					room.trim(), "\",\"canvasID\":\"", client.nickname, "\"}");
-			broadcast(client.session, msg, client.nickname, false);
-		}
+		
+		sendMessage(session, message, nickname, room, client);
 
 		for (ChatAnnotation otherclient : connections) {
 			if (otherclient.nickname != client.nickname) {
@@ -192,52 +178,16 @@ public class ChatAnnotation {
 						"{", "\"command\":", "\"initCanvasSlave\",",
 						"\"room\":\"", room.trim(), "\",\"canvasID\":\"",
 						otherclient.nickname, "\"}");
-				try {
-					synchronized (client) {
-						client.session.getBasicRemote().sendText(messageOther);
-					}
-				} catch (IOException e) {
-					log.log(Level.WARNING,
-							"Chat Error: Failed to send message to client", e);
-					connections.remove(client);
-					try {
-						client.session.close();
-					} catch (IOException e1) {
-						// Ignore
-					}
-					String msg = String.format("%s %s %s %s %s %s %s %s", "{",
-							"\"command\":", "\"finalizeCanvasSlave\",",
-							"\"room\":\"", room.trim(), "\",\"canvasID\":\"",
-							client.nickname, "\"}");
-					broadcast(client.session, msg, client.nickname, false);
-				}
+				
+				sendMessage(session, messageOther, nickname, room, client);
 				
 				// Send the other client's draw commands to this new client
 				for (String command : otherclient.receivedDrawMessages) {
-					
-					try {
-						synchronized (client) {
-							client.session.getBasicRemote().sendText(command);
-						}
-					} catch (IOException e) {
-						log.log(Level.WARNING,
-								"Chat Error: Failed to send message to client",
-								e);
-						connections.remove(client);
-						try {
-							client.session.close();
-						} catch (IOException e1) {
-							// Ignore
-						}
-						String msg = String.format("%s %s %s %s %s %s %s %s",
-								"{", "\"command\":",
-								"\"finalizeCanvasSlave\",", "\"room\":\"",
-								room.trim(), "\",\"canvasID\":\"",
-								client.nickname, "\"}");
-						broadcast(client.session, msg, client.nickname, false);
-					}
+					sendMessage(session, command, nickname, room, client);
 				}
 			}
 		}
+		
 	}
+	
 }
