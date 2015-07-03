@@ -32,7 +32,6 @@ Chat.connect = (function(host) {
 	Chat.socket.onmessage = function(message) {
 		// Console.log(message.data);
 		processCommands(message.data);
-		savedDrawCommands[message.data.pageNum] = message.data;
 	};
 });
 
@@ -77,6 +76,7 @@ processCommands = function(message) {
 		initCanvasSlave(mes.canvasID.trim());
 	} else if (mes.command === "drawLinesSlave") {
 		drawLinesSlave(mes.slaveID, mes.type, mes.x, mes.y);
+		saveDrawLinesSlave(mes);
 	} else if (mes.command === "setMySlaveID") {
 		initSlaveID(mes);
 	} else if (mes.command === "finalizeCanvasSlave") {
@@ -92,6 +92,11 @@ initSlaveID = function(mes){
 	isPresentation = mes.isPresentation;
 	presentationURI = mes.presentationURI;
 	if(!isPresentation) {
+		currentPage = 0;
 		savedDrawCommands["0"] = new Array(); 
 	}
+}
+
+saveDrawLinesSlave = function(mes){
+	savedDrawCommands[currentPage.toString()].push(mes);
 }
