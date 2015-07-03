@@ -29,12 +29,15 @@
 	<script>
 	    var INITICANVASWIDTH = 512;
 	    var INITICANVASHEIGHT = 288;
+	    var CURRENTCANVASWIDTH = INITICANVASWIDTH;
+	    var CURRENTCANVASHEIGHT = INITICANVASHEIGHT;
 		var mySlaveID = -1;
 		var myCurrentPage = 0;
 		var myMeeringRoomNum ="<%=(String)request.getParameter("room")%>";
 		var savedDrawCommands = {};
 		var isPresentation = false;
 		var presentationURI = "NotAPresentation";
+		var currentPage = 0;
 
 		initCanvasMaster("M0");
 

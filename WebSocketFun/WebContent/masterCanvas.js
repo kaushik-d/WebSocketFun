@@ -29,14 +29,16 @@ function updateLine(evt) {
 	evt.preventDefault();
 	var ID = parseInt((this.id)[1]);
 	var mousePos = getMousePos(canvasListMaster[ID], evt);
+	
 	Chat.socket.send(JSON.stringify({
 		command : "drawLinesSlave",
 		type : "lineUpdate",
-		x : mousePos.x,
-		y : mousePos.y,
+		x : mousePos.x/CURRENTCANVASWIDTH,
+		y : mousePos.y/CURRENTCANVASHEIGHT,
 		slaveID : mySlaveID,
 		pageNum : myCurrentPage
 	}));
+	
 	drawLinesMaster(ID, "lineUpdate", mousePos.x, mousePos.y);
 }
 
@@ -44,13 +46,15 @@ function startLine(evt) {
 	evt.preventDefault();
 	var ID = parseInt((this.id)[1]);
 	var mousePos = getMousePos(canvasListMaster[ID], evt);
+	
 	Chat.socket.send(JSON.stringify({
 		command : "drawLinesSlave",
 		type : "lineStart",
-		x : mousePos.x,
-		y : mousePos.y,
+		x : mousePos.x/CURRENTCANVASWIDTH,
+		y : mousePos.y/CURRENTCANVASHEIGHT,
 		slaveID : mySlaveID
 	}));
+	
 	drawLinesMaster(ID, "lineStart", mousePos.x, mousePos.y);
 	canvasListMaster[ID].addEventListener('mousemove', updateLine, false);
 	canvasListMaster[ID].addEventListener('mousemove', updateMousePosition,
@@ -64,13 +68,15 @@ function endLine(evt) {
 	evt.preventDefault();
 	var ID = parseInt((this.id)[1]);
 	var mousePos = getMousePos(canvasListMaster[ID], evt);
+	
 	Chat.socket.send(JSON.stringify({
 		command : "drawLinesSlave",
 		type : "lineEnd",
-		x : mousePos.x,
-		y : mousePos.y,
+		x : mousePos.x/CURRENTCANVASWIDTH,
+		y : mousePos.y/CURRENTCANVASHEIGHT,
 		slaveID : mySlaveID
 	}));
+	
 	drawLinesMaster(ID, "lineEnd", mousePos.x, mousePos.y);
 	canvasListMaster[ID].removeEventListener('mousemove', updateLine, false);
 	canvasListMaster[ID].removeEventListener('mousemove', updateMousePosition,

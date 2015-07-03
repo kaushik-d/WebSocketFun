@@ -78,12 +78,20 @@ processCommands = function(message) {
 	} else if (mes.command === "drawLinesSlave") {
 		drawLinesSlave(mes.slaveID, mes.type, mes.x, mes.y);
 	} else if (mes.command === "setMySlaveID") {
-		canvasName = mes.canvasID.trim()
-		mySlaveID = parseInt(canvasName.substring(1, canvasName.length));
-
+		initSlaveID(mes);
 	} else if (mes.command === "finalizeCanvasSlave") {
 		finalizeCanvasSlave(mes.canvasID.trim());
 	} else if (mes.command === "textMessage") {
 		Console.log(mes.text);
+	}
+}
+
+initSlaveID = function(mes){
+	canvasName = mes.canvasID.trim()
+	mySlaveID = parseInt(canvasName.substring(1, canvasName.length));
+	isPresentation = mes.isPresentation;
+	presentationURI = mes.presentationURI;
+	if(!isPresentation) {
+		savedDrawCommands["0"] = new Array(); 
 	}
 }

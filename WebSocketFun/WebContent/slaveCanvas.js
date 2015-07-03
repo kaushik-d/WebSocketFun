@@ -8,6 +8,10 @@ var oldxListSlave = new Array();
 var oldyListSlave = new Array();
 
 function drawLinesSlave(ID, type, x, y) {
+	
+	x = x*CURRENTCANVASWIDTH;
+	y = y*CURRENTCANVASHEIGHT;
+	
 	contextListSlave[ID].beginPath();
 	if (type === "lineStart") {
 		oldxListSlave[ID] = x;
