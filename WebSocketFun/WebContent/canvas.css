@@ -1,10 +1,41 @@
-
 body {
 	margin: 0px;
 	padding: 0px;
 	position: relative;
 	width: 100%;
 	height: 100%;
+}
+
+*:fullscreen, *:-webkit-full-screen, *:-moz-full-screen {
+	background-color: rgba(255, 255, 0, 1);
+}
+
+#container:fullscreen {
+	background-color: rgba(255, 255, 255, 0);
+}
+
+#container:-webkit-full-screen {
+	background-color: rgba(255, 255, 255, 0);
+}
+
+#container:-moz-full-screen {
+	background-color: rgba(255, 255, 255, 0);
+}
+
+div:-webkit-full-screen>canvas {
+	width: 100%;
+}
+
+div:-moz-full-screen>canvas {
+	width: 100%;
+}
+
+div:-ms-fullscreen>canvas {
+	width: 100%;
+}
+
+div:fullscreen>canvas {
+	width: 100%;
 }
 
 input#chat {
@@ -16,7 +47,7 @@ input#chat {
 	width: 400px;
 	position: relative;
 	margin-left: auto;
-    margin-right: auto;
+	margin-right: auto;
 }
 
 #console {
@@ -38,35 +69,43 @@ input#chat {
 
 #canvasDiv {
 	position: relative;
-	width: 512px;   /* 1024×576 or 16:9 */
+	width: 512px; /* 1024×576 or 16:9 */
 	height: 288px;
 	position: relative;
 	border: 1px solid;
 	margin-left: auto;
-    margin-right: auto;
+	margin-right: auto;
 }
+
 #messageDiv {
 	position: relative;
 	position: relative;
 	border: 1px solid;
 	margin-left: auto;
-    margin-right: auto;
-    width: 400px;
-}
-#chatArea {
-	margin-left: auto;
-    margin-right: auto;
-    position: relative;
+	margin-right: auto;
+	width: 400px;
 }
 
-p{
+#chatArea {
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+}
+
+p {
 	width: 400px;
 	margin-left: auto;
-    margin-right: auto;
+	margin-right: auto;
 }
 
 canvas {
 	position: absolute;
 	width: 100%;
 	height: 100%;
+}
+
+#menuDiv {
+	position: absolute;
+	width: 100%;
+	border: 1px solid;
 }

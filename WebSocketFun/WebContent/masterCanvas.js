@@ -19,6 +19,7 @@ function drawLinesMaster(ID, type, x, y) {
 		contextListMaster[ID].lineTo(x, y);
 		oldxListMaster[ID] = x;
 		oldyListMaster[ID] = y;
+		contextListMaster[ID].strokeStyle = '#ff0000';
 		contextListMaster[ID].stroke();
 	} else {
 		lineStartedListMaster[ID] = false;
@@ -93,13 +94,9 @@ function initCanvasMaster(canvasName) {
 	canvasListMaster[ID].id = canvasName;
 	canvasListMaster[ID].width = INITICANVASWIDTH;
 	canvasListMaster[ID].height = INITICANVASHEIGHT;
-	//canvasListMaster[ID].width = parseInt(convasDiv.style.width);
-	//canvasListMaster[ID].height = parseInt(convasDiv.style.height);;
 	canvasListMaster[ID].left = 0;
 	canvasListMaster[ID].right = 0;
 	canvasListMaster[ID].style.zIndex = 0;
-	//canvasListMaster[ID].style.position = "absolute";
-	//canvasListMaster[ID].style.border = "1px solid";
 	canvasDiv.appendChild(canvasListMaster[ID]);
 	contextListMaster[ID] = canvasListMaster[ID].getContext('2d');
 	lineStartedListMaster[ID] = false;

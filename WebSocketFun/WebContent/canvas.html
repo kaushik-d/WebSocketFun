@@ -3,6 +3,28 @@
 
 <head>
 <link rel="stylesheet" type="text/css" href="canvas.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="utility.js"></script>
+<script src="masterCanvas.js"></script>
+<script src="slaveCanvas.js"></script>
+<script src="chat.js"></script>
+<script>
+	$(document).ready(function(){
+		var mySlaveID = -1;
+		var myCurrentPage = 0;
+		var savedDrawCommands = Array();
+		
+		addFullScreenListners();
+
+		initCanvasMaster("M0");
+		
+		
+
+		Chat.initialize();
+		
+	};
+	</script>
 </head>
 
 <body>
@@ -19,19 +41,7 @@
 			<div id="console"></div>
 		</div>
 	</div>
-	<script src="utility.js"></script>
-	<script src="masterCanvas.js"></script>
-	<script src="slaveCanvas.js"></script>
-	<script src="chat.js"></script>
-	<script>
-		var mySlaveID = -1;
-		var myCurrentPage = 0;
-		var savedDrawCommands = Array();
 
-		initCanvasMaster("M0");
-
-		Chat.initialize();
-	</script>
 </body>
 
 </html>

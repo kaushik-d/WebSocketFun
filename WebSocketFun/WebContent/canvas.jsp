@@ -1,11 +1,51 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" type="text/css" href="canvas.css">
 <title>Insert title here</title>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="utility.js"></script>
+<script src="masterCanvas.js"></script>
+<script src="slaveCanvas.js"></script>
+<script src="chat.js"></script>
+<script>
+	var INITICANVASWIDTH = 512;
+	var INITICANVASHEIGHT = 288;
+	var CURRENTCANVASWIDTH = INITICANVASWIDTH;
+	var CURRENTCANVASHEIGHT = INITICANVASHEIGHT;
+	var MENUBARHEIGHT = 20;
+	var mySlaveID = -1;
+	var myCurrentPage = 0;
+	var myMeeringRoomNum ="<%=(String) request.getParameter("room")%>";
+	var savedDrawCommands = {};
+	var isPresentation = false;
+	var presentationURI = "NotAPresentation";
+	var currentPage = 0;
+</script>
+<script>
+	$(document).ready(function() {
+
+		initCanvasMaster("M0");
+
+		Chat.initialize();
+		
+		addFullScreenListners()
+
+		$("#canvasDiv").append("<div id=\"menuDiv\"></div>");
+		$("#menuDiv").css(
+				{"height":MENUBARHEIGHT,
+					"top":CURRENTCANVASHEIGHT-MENUBARHEIGHT,
+					//"buttom":CURRENTCANVASHEIGHT-MENUBARHEIGHT,
+					"width":"100%"});
+		$("#menuDiv").append("<button id=\"fullScreenButton\">Go Fullscreen</button>");
+		$("#fullScreenButton").css({"height":"100%"});
+		$("#fullScreenButton").click(goFullScreen);
+	});
+</script>
 </head>
 <body>
 	<div id="canvasDiv"></div>
@@ -21,27 +61,5 @@
 			<div id="console"></div>
 		</div>
 	</div>
-	<script src="utility.js"></script>
-	<script src="masterCanvas.js"></script>
-	<script src="slaveCanvas.js"></script>
-	<script src="chat.js"></script>
-	<%String roomNum = (String)request.getParameter("room");%>
-	<script>
-	    var INITICANVASWIDTH = 512;
-	    var INITICANVASHEIGHT = 288;
-	    var CURRENTCANVASWIDTH = INITICANVASWIDTH;
-	    var CURRENTCANVASHEIGHT = INITICANVASHEIGHT;
-		var mySlaveID = -1;
-		var myCurrentPage = 0;
-		var myMeeringRoomNum ="<%=(String)request.getParameter("room")%>";
-		var savedDrawCommands = {};
-		var isPresentation = false;
-		var presentationURI = "NotAPresentation";
-		var currentPage = 0;
-
-		initCanvasMaster("M0");
-
-		Chat.initialize();
-	</script>
 </body>
 </html>

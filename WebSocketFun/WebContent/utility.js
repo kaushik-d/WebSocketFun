@@ -25,19 +25,111 @@ function updateMousePosition(evt) {
 	writeMessage(message);
 }
 
-function getOffset( elem )
-{
-    var offsetLeft = 0;
-    var offsetTop = 0;
-    do {
-      if ( !isNaN( elem.offsetLeft ) )
-      {
-          offsetLeft += elem.offsetLeft;
-      }
-      if ( !isNaN( elem.offsetRight ) )
-      {
-    	  offsetTop += elem.offsetTop;
-      }
-    } while( elem = elem.offsetParent );
-    return {x: offsetTop, y: offsetLeft};
+function getOffset(elem) {
+	var offsetLeft = 0;
+	var offsetTop = 0;
+	do {
+		if (!isNaN(elem.offsetLeft)) {
+			offsetLeft += elem.offsetLeft;
+		}
+		if (!isNaN(elem.offsetRight)) {
+			offsetTop += elem.offsetTop;
+		}
+	} while (elem = elem.offsetParent);
+	return {
+		x : offsetTop,
+		y : offsetLeft
+	};
+}
+
+function addFullScreenListners() {
+	document.addEventListener('webkitfullscreenchange', function(e) {
+		restore();
+	}, false);
+
+	document.addEventListener('mozfullscreenchange', function(e) {
+		restore();
+	}, false);
+
+	document.addEventListener('fullscreenchange', function(e) {
+		restore();
+	}, false);
+}
+
+function goFullScreen() {
+	var parentDiv = document.getElementById("canvasDiv");
+	if (parentDiv.requestFullScreen) {
+		parentDiv.requestFullscreen();
+	} else if (parentDiv.webkitRequestFullScreen) {
+		parentDiv.webkitRequestFullscreen();
+	} else if (parentDiv.mozRequestFullScreen) {
+		parentDiv.mozRequestFullScreen();
+	}
+
+}
+
+function restore() {
+
+	if (!window.screenTop && !window.screenY) {
+		console.log('not fullscreen');
+		CURRENTCANVASWIDTH = screen.width;
+		CURRENTCANVASHEIGHT = screen.height;
+		$("#canvasDiv").attr({
+			"width" : CURRENTCANVASWIDTH,
+			"height" : CURRENTCANVASHEIGHT
+		});
+		$("#canvasDiv").css({
+			"width" : CURRENTCANVASWIDTH,
+			"height" : CURRENTCANVASHEIGHT
+		});
+		$("canvas").attr({
+			"width" : CURRENTCANVASWIDTH,
+			"height" : CURRENTCANVASHEIGHT
+		});
+		$("#menuDiv").css({
+			"top" : CURRENTCANVASHEIGHT - MENUBARHEIGHT,
+		//"buttom":CURRENTCANVASHEIGHT-MENUBARHEIGHT
+		});
+
+		var arrayLength = contextListMaster.length;
+		for (var i = 0; i < arrayLength; i++) {
+			if (contextListMaster[i] != null
+					&& contextListMaster[i] != undefined
+					&& typeof contextListMaster[i] != 'undefined') {
+				contextListMaster[i].clearRect(0, 0, CURRENTCANVASWIDTH,
+						CURRENTCANVASHEIGHT);
+			}
+		}
+		arrayLength = contextListSlave.length;
+		for (var i = 0; i < arrayLength; i++) {
+			if (contextListSlave[i] != null
+					&& contextListSlave[i] != undefined
+					&& typeof contextListSlave[i] != 'undefined') {
+				contextListSlave[i].clearRect(0, 0, CURRENTCANVASWIDTH,
+						CURRENTCANVASHEIGHT);
+			}
+		}
+		//init();
+	} else {
+		CURRENTCANVASWIDTH = INITICANVASWIDTH;
+		CURRENTCANVASHEIGHT = INITICANVASHEIGHT;
+		$("#canvasDiv").attr({
+			"width" : CURRENTCANVASWIDTH,
+			"height" : CURRENTCANVASHEIGHT
+		});
+		$("#canvasDiv").css({
+			"width" : CURRENTCANVASWIDTH,
+			"height" : CURRENTCANVASHEIGHT
+		});
+		$("canvas").attr({
+			"width" : CURRENTCANVASWIDTH,
+			"height" : CURRENTCANVASHEIGHT
+		});
+		$("#menuDiv").css({
+			"top" : CURRENTCANVASHEIGHT - MENUBARHEIGHT,
+		//"buttom":CURRENTCANVASHEIGHT-MENUBARHEIGHT
+		});
+		//init();
+		console.log('fullscreen');
+	}
 }

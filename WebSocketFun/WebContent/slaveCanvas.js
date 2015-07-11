@@ -23,6 +23,7 @@ function drawLinesSlave(ID, type, x, y) {
 		contextListSlave[ID].lineTo(x, y);
 		oldxListSlave[ID] = x;
 		oldyListSlave[ID] = y;
+		contextListSlave[ID].strokeStyle = '#ff0000';
 		contextListSlave[ID].stroke();
 	} else {
 		lineStartedListSlave[ID] = false;
@@ -34,13 +35,11 @@ function initCanvasSlave(canvasName) {
 	var canvasDiv = window.document.getElementById('canvasDiv');
 	canvasListSlave[ID] = document.createElement('canvas');
 	canvasListSlave[ID].id = canvasName;
-	canvasListSlave[ID].width = INITICANVASWIDTH;
-	canvasListSlave[ID].height = INITICANVASHEIGHT;
+	canvasListSlave[ID].width = CURRENTCANVASWIDTH;
+	canvasListSlave[ID].height = CURRENTCANVASHEIGHT;
 	canvasListSlave[ID].left = 0;
 	canvasListSlave[ID].right = 0;
 	canvasListSlave[ID].style.zIndex = -ID-1;
-	//canvasListSlave[ID].style.position = "absolute";
-	//canvasListSlave[ID].style.border = "1px solid";
 	canvasDiv.appendChild(canvasListSlave[ID]);
 	contextListSlave[ID] = canvasListSlave[ID].getContext('2d');
 	lineStartedListSlave[ID] = false;
