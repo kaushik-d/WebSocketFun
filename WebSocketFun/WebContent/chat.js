@@ -78,7 +78,7 @@ processCommands = function(message) {
 		drawLinesSlave(mes.slaveID, mes.type, mes.x, mes.y);
 		saveDrawLinesSlave(mes);
 	} else if (mes.command === "setMySlaveID") {
-		initSlaveID(mes);
+		setMySlaveID(mes);
 	} else if (mes.command === "finalizeCanvasSlave") {
 		finalizeCanvasSlave(mes.canvasID.trim());
 	} else if (mes.command === "textMessage") {
@@ -86,14 +86,22 @@ processCommands = function(message) {
 	}
 }
 
-initSlaveID = function(mes){
+setMySlaveID = function(mes){
 	canvasName = mes.canvasID.trim()
 	mySlaveID = parseInt(canvasName.substring(1, canvasName.length));
 	isPresentation = mes.isPresentation;
 	presentationURI = mes.presentationURI;
+	
+	isPresentation = true;
+	presentationURI = "./pdfExample/TestPage.pdf";
+	
 	if(!isPresentation) {
 		currentPage = 0;
 		savedDrawCommands["0"] = new Array(); 
+	}
+	else {
+		currentPage = 0;
+		initCanvasPresentation();
 	}
 }
 

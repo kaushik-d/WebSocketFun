@@ -11,20 +11,29 @@
 <script src="utility.js"></script>
 <script src="masterCanvas.js"></script>
 <script src="slaveCanvas.js"></script>
+<script src="presentationCanvas.js"></script>
 <script src="chat.js"></script>
+<script src="pdf.js"></script>
+<script src="compatibility.js"></script>
 <script>
+    PDFJS.workerSrc = 'pdf.worker.js';
+  </script>
+<script>
+	"use strict";
 	var INITICANVASWIDTH = 512;
 	var INITICANVASHEIGHT = 288;
 	var CURRENTCANVASWIDTH = INITICANVASWIDTH;
 	var CURRENTCANVASHEIGHT = INITICANVASHEIGHT;
 	var MENUBARHEIGHT = 20;
 	var mySlaveID = -1;
-	var myCurrentPage = 0;
 	var myMeeringRoomNum ="<%=(String) request.getParameter("room")%>";
 	var savedDrawCommands = {};
 	var isPresentation = false;
 	var presentationURI = "NotAPresentation";
 	var currentPage = 0;
+	var canvasPresentation = null;
+	var contextPresentation = null;
+	var numPresentationPages = 1;
 </script>
 <script>
 	$(document).ready(function() {
