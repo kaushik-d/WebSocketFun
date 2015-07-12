@@ -8,8 +8,8 @@ function writeMessage(message) {
 function getMousePos(canvas, evt) {
 	var rect = canvas.getBoundingClientRect();
 	return {
-		x : evt.clientX - rect.left,
-		y : evt.clientY - rect.top
+		x : (evt.clientX - rect.left)/CURRENTCANVASWIDTH,
+		y : (evt.clientY - rect.top)/CURRENTCANVASHEIGHT
 	};
 	// offset = getOffset( canvas );
 	// return {
@@ -155,5 +155,7 @@ redrawCurrentPageContents = function() {
 		var drawCommand = savedDrawCommandsMaster[i];
 		drawLinesMaster(0, drawCommand.type, drawCommand.x, drawCommand.y);
 	}
+	
+	renderPresentationPage(presentationPdf);
 
 }
