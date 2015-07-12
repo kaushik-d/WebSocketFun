@@ -97,7 +97,7 @@ setMySlaveID = function(mes){
 	
 	if(!isPresentation) {
 		currentPage = 0;
-		savedDrawCommands["0"] = new Array(); 
+		//savedDrawCommands["0"] = new Array(); 
 	}
 	else {
 		currentPage = 0;
@@ -106,5 +106,8 @@ setMySlaveID = function(mes){
 }
 
 saveDrawLinesSlave = function(mes){
+	if( typeof savedDrawCommands[currentPage.toString()] == 'undefined' ){
+		savedDrawCommands[currentPage.toString()] = new Array();
+	}
 	savedDrawCommands[currentPage.toString()].push(mes);
 }

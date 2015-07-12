@@ -31,14 +31,18 @@ function updateLine(evt) {
 	var ID = parseInt((this.id)[1]);
 	var mousePos = getMousePos(canvasListMaster[ID], evt);
 	
-	Chat.socket.send(JSON.stringify({
-		command : "drawLinesSlave",
-		type : "lineUpdate",
-		x : mousePos.x/CURRENTCANVASWIDTH,
-		y : mousePos.y/CURRENTCANVASHEIGHT,
-		slaveID : mySlaveID,
-		pageNum : myCurrentPage
-	}));
+	var mes = {
+			command : "drawLinesSlave",
+			type : "lineUpdate",
+			x : mousePos.x/CURRENTCANVASWIDTH,
+			y : mousePos.y/CURRENTCANVASHEIGHT,
+			slaveID : mySlaveID,
+			pageNum : currentPage
+		};
+	
+	savedDrawCommandsMaster.push(mes);
+	
+	Chat.socket.send(JSON.stringify(mes));
 	
 	drawLinesMaster(ID, "lineUpdate", mousePos.x, mousePos.y);
 }
@@ -48,13 +52,18 @@ function startLine(evt) {
 	var ID = parseInt((this.id)[1]);
 	var mousePos = getMousePos(canvasListMaster[ID], evt);
 	
-	Chat.socket.send(JSON.stringify({
-		command : "drawLinesSlave",
-		type : "lineStart",
-		x : mousePos.x/CURRENTCANVASWIDTH,
-		y : mousePos.y/CURRENTCANVASHEIGHT,
-		slaveID : mySlaveID
-	}));
+	var mes = {
+			command : "drawLinesSlave",
+			type : "lineStart",
+			x : mousePos.x/CURRENTCANVASWIDTH,
+			y : mousePos.y/CURRENTCANVASHEIGHT,
+			slaveID : mySlaveID,
+			pageNum : currentPage
+		};
+	
+	savedDrawCommandsMaster.push(mes);
+	
+	Chat.socket.send(JSON.stringify(mes));
 	
 	drawLinesMaster(ID, "lineStart", mousePos.x, mousePos.y);
 	canvasListMaster[ID].addEventListener('mousemove', updateLine, false);
@@ -70,13 +79,18 @@ function endLine(evt) {
 	var ID = parseInt((this.id)[1]);
 	var mousePos = getMousePos(canvasListMaster[ID], evt);
 	
-	Chat.socket.send(JSON.stringify({
-		command : "drawLinesSlave",
-		type : "lineEnd",
-		x : mousePos.x/CURRENTCANVASWIDTH,
-		y : mousePos.y/CURRENTCANVASHEIGHT,
-		slaveID : mySlaveID
-	}));
+	var mes = {
+			command : "drawLinesSlave",
+			type : "lineEnd",
+			x : mousePos.x/CURRENTCANVASWIDTH,
+			y : mousePos.y/CURRENTCANVASHEIGHT,
+			slaveID : mySlaveID,
+			pageNum : currentPage
+		};
+	
+	savedDrawCommandsMaster.push(mes);
+	
+	Chat.socket.send(JSON.stringify(mes));
 	
 	drawLinesMaster(ID, "lineEnd", mousePos.x, mousePos.y);
 	canvasListMaster[ID].removeEventListener('mousemove', updateLine, false);

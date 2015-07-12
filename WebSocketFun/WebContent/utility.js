@@ -11,11 +11,11 @@ function getMousePos(canvas, evt) {
 		x : evt.clientX - rect.left,
 		y : evt.clientY - rect.top
 	};
-	//offset = getOffset( canvas );
-	//return {
-	//	x : evt.pageX - offset.x,
-	//	y : evt.pageY - offset.y
-	//};
+	// offset = getOffset( canvas );
+	// return {
+	// x : evt.pageX - offset.x,
+	// y : evt.pageY - offset.y
+	// };
 }
 
 function updateMousePosition(evt) {
@@ -88,28 +88,11 @@ function restore() {
 		});
 		$("#menuDiv").css({
 			"top" : CURRENTCANVASHEIGHT - MENUBARHEIGHT,
-		//"buttom":CURRENTCANVASHEIGHT-MENUBARHEIGHT
+		// "buttom":CURRENTCANVASHEIGHT-MENUBARHEIGHT
 		});
 
-		var arrayLength = contextListMaster.length;
-		for (var i = 0; i < arrayLength; i++) {
-			if (contextListMaster[i] != null
-					&& contextListMaster[i] != undefined
-					&& typeof contextListMaster[i] != 'undefined') {
-				contextListMaster[i].clearRect(0, 0, CURRENTCANVASWIDTH,
-						CURRENTCANVASHEIGHT);
-			}
-		}
-		arrayLength = contextListSlave.length;
-		for (var i = 0; i < arrayLength; i++) {
-			if (contextListSlave[i] != null
-					&& contextListSlave[i] != undefined
-					&& typeof contextListSlave[i] != 'undefined') {
-				contextListSlave[i].clearRect(0, 0, CURRENTCANVASWIDTH,
-						CURRENTCANVASHEIGHT);
-			}
-		}
-		//init();
+		redrawCurrentPageContents();
+
 	} else {
 		CURRENTCANVASWIDTH = INITICANVASWIDTH;
 		CURRENTCANVASHEIGHT = INITICANVASHEIGHT;
@@ -127,9 +110,50 @@ function restore() {
 		});
 		$("#menuDiv").css({
 			"top" : CURRENTCANVASHEIGHT - MENUBARHEIGHT,
-		//"buttom":CURRENTCANVASHEIGHT-MENUBARHEIGHT
+		// "buttom":CURRENTCANVASHEIGHT-MENUBARHEIGHT
 		});
-		//init();
+
+		redrawCurrentPageContents();
+
 		console.log('fullscreen');
 	}
+}
+
+redrawCurrentPageContents = function() {
+	var arrayLength = contextListMaster.length;
+	for (var i = 0; i < arrayLength; i++) {
+		if (contextListMaster[i] != null && contextListMaster[i] != undefined
+				&& typeof contextListMaster[i] != 'undefined') {
+			contextListMaster[i].clearRect(0, 0, CURRENTCANVASWIDTH,
+					CURRENTCANVASHEIGHT);
+		}
+	}
+	arrayLength = contextListSlave.length;
+	for (var i = 0; i < arrayLength; i++) {
+		if (contextListSlave[i] != null && contextListSlave[i] != undefined
+				&& typeof contextListSlave[i] != 'undefined') {
+			contextListSlave[i].clearRect(0, 0, CURRENTCANVASWIDTH,
+					CURRENTCANVASHEIGHT);
+		}
+	}
+	
+	if (typeof savedDrawCommands[currentPage.toString()] != 'undefined') {
+
+		saveDrawCommandsForCurrentPage = savedDrawCommands[currentPage
+				.toString()];
+
+		for (i = 0; i < saveDrawCommandsForCurrentPage.length; i++) {
+			
+			var drawCommand = saveDrawCommandsForCurrentPage[i];
+			drawLinesSlave(drawCommand.slaveID, drawCommand.type,
+					drawCommand.x, drawCommand.y);
+		}
+
+	}
+
+	for (i = 0; i < savedDrawCommandsMaster.length; i++) {
+		var drawCommand = savedDrawCommandsMaster[i];
+		drawLinesMaster(0, drawCommand.type, drawCommand.x, drawCommand.y);
+	}
+
 }
