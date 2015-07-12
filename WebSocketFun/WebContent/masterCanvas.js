@@ -9,6 +9,10 @@ var oldxListMaster = new Array();
 var oldyListMaster = new Array();
 
 function drawLinesMaster(ID, type, x, y) {
+	
+	x = x*CURRENTCANVASWIDTH;
+	y = y*CURRENTCANVASHEIGHT;
+	
 	contextListMaster[ID].beginPath();
 	if (type === "lineStart") {
 		oldxListMaster[ID] = x;
@@ -34,8 +38,8 @@ function updateLine(evt) {
 	var mes = {
 			command : "drawLinesSlave",
 			type : "lineUpdate",
-			x : mousePos.x/CURRENTCANVASWIDTH,
-			y : mousePos.y/CURRENTCANVASHEIGHT,
+			x : mousePos.x,
+			y : mousePos.y,
 			slaveID : mySlaveID,
 			pageNum : currentPage
 		};
@@ -55,8 +59,8 @@ function startLine(evt) {
 	var mes = {
 			command : "drawLinesSlave",
 			type : "lineStart",
-			x : mousePos.x/CURRENTCANVASWIDTH,
-			y : mousePos.y/CURRENTCANVASHEIGHT,
+			x : mousePos.x,
+			y : mousePos.y,
 			slaveID : mySlaveID,
 			pageNum : currentPage
 		};
@@ -82,8 +86,8 @@ function endLine(evt) {
 	var mes = {
 			command : "drawLinesSlave",
 			type : "lineEnd",
-			x : mousePos.x/CURRENTCANVASWIDTH,
-			y : mousePos.y/CURRENTCANVASHEIGHT,
+			x : mousePos.x,
+			y : mousePos.y,
 			slaveID : mySlaveID,
 			pageNum : currentPage
 		};
