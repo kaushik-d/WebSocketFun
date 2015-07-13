@@ -9,24 +9,30 @@ var oldxListMaster = new Array();
 var oldyListMaster = new Array();
 
 function drawLinesMaster(ID, type, x, y) {
-	
-	x = x*CURRENTCANVASWIDTH;
-	y = y*CURRENTCANVASHEIGHT;
-	
-	contextListMaster[ID].beginPath();
-	if (type === "lineStart") {
-		oldxListMaster[ID] = x;
-		oldyListMaster[ID] = y;
-		lineStartedListMaster[ID] = true;
-	} else if (type === "lineUpdate" && lineStartedListMaster[ID]) {
-		contextListMaster[ID].moveTo(oldxListMaster[ID], oldyListMaster[ID]);
-		contextListMaster[ID].lineTo(x, y);
-		oldxListMaster[ID] = x;
-		oldyListMaster[ID] = y;
-		contextListMaster[ID].strokeStyle = '#ff0000';
-		contextListMaster[ID].stroke();
-	} else {
-		lineStartedListMaster[ID] = false;
+
+	if (contextListMaster[ID] != null
+			&& typeof contextListMaster[ID] != 'undefined'
+			&& contextListMaster[ID] != undefined) {
+		
+		x = x * CURRENTCANVASWIDTH;
+		y = y * CURRENTCANVASHEIGHT;
+
+		contextListMaster[ID].beginPath();
+		if (type === "lineStart") {
+			oldxListMaster[ID] = x;
+			oldyListMaster[ID] = y;
+			lineStartedListMaster[ID] = true;
+		} else if (type === "lineUpdate" && lineStartedListMaster[ID]) {
+			contextListMaster[ID]
+					.moveTo(oldxListMaster[ID], oldyListMaster[ID]);
+			contextListMaster[ID].lineTo(x, y);
+			oldxListMaster[ID] = x;
+			oldyListMaster[ID] = y;
+			contextListMaster[ID].strokeStyle = '#ff0000';
+			contextListMaster[ID].stroke();
+		} else {
+			lineStartedListMaster[ID] = false;
+		}
 	}
 }
 
@@ -34,20 +40,20 @@ function updateLine(evt) {
 	evt.preventDefault();
 	var ID = parseInt((this.id)[1]);
 	var mousePos = getMousePos(canvasListMaster[ID], evt);
-	
+
 	var mes = {
-			command : "drawLinesSlave",
-			type : "lineUpdate",
-			x : mousePos.x,
-			y : mousePos.y,
-			slaveID : mySlaveID,
-			pageNum : currentPage
-		};
-	
-	savedDrawCommandsMaster.push(mes);
-	
+		command : "drawLinesSlave",
+		type : "lineUpdate",
+		x : mousePos.x,
+		y : mousePos.y,
+		slaveID : mySlaveID,
+		pageNum : currentPage
+	};
+
+	saveDrawLinesMaster(mes);
+
 	Chat.socket.send(JSON.stringify(mes));
-	
+
 	drawLinesMaster(ID, "lineUpdate", mousePos.x, mousePos.y);
 }
 
@@ -55,20 +61,20 @@ function startLine(evt) {
 	evt.preventDefault();
 	var ID = parseInt((this.id)[1]);
 	var mousePos = getMousePos(canvasListMaster[ID], evt);
-	
+
 	var mes = {
-			command : "drawLinesSlave",
-			type : "lineStart",
-			x : mousePos.x,
-			y : mousePos.y,
-			slaveID : mySlaveID,
-			pageNum : currentPage
-		};
-	
-	savedDrawCommandsMaster.push(mes);
-	
+		command : "drawLinesSlave",
+		type : "lineStart",
+		x : mousePos.x,
+		y : mousePos.y,
+		slaveID : mySlaveID,
+		pageNum : currentPage
+	};
+
+	saveDrawLinesMaster(mes);
+
 	Chat.socket.send(JSON.stringify(mes));
-	
+
 	drawLinesMaster(ID, "lineStart", mousePos.x, mousePos.y);
 	canvasListMaster[ID].addEventListener('mousemove', updateLine, false);
 	canvasListMaster[ID].addEventListener('mousemove', updateMousePosition,
@@ -82,20 +88,20 @@ function endLine(evt) {
 	evt.preventDefault();
 	var ID = parseInt((this.id)[1]);
 	var mousePos = getMousePos(canvasListMaster[ID], evt);
-	
+
 	var mes = {
-			command : "drawLinesSlave",
-			type : "lineEnd",
-			x : mousePos.x,
-			y : mousePos.y,
-			slaveID : mySlaveID,
-			pageNum : currentPage
-		};
-	
-	savedDrawCommandsMaster.push(mes);
-	
+		command : "drawLinesSlave",
+		type : "lineEnd",
+		x : mousePos.x,
+		y : mousePos.y,
+		slaveID : mySlaveID,
+		pageNum : currentPage
+	};
+
+	saveDrawLinesMaster(mes);
+
 	Chat.socket.send(JSON.stringify(mes));
-	
+
 	drawLinesMaster(ID, "lineEnd", mousePos.x, mousePos.y);
 	canvasListMaster[ID].removeEventListener('mousemove', updateLine, false);
 	canvasListMaster[ID].removeEventListener('mousemove', updateMousePosition,
@@ -126,4 +132,11 @@ function initCanvasMaster(canvasName) {
 	canvasListMaster[ID].addEventListener('touchstart', startLine, false);
 	canvasListMaster[ID].addEventListener('touchleave', endLine, false);
 	canvasListMaster[ID].addEventListener('touchend', endLine, false);
+}
+
+saveDrawLinesMaster = function(mes) {
+	if (typeof savedDrawCommandsMaster[currentPage.toString()] == 'undefined') {
+		savedDrawCommandsMaster[currentPage.toString()] = new Array();
+	}
+	savedDrawCommandsMaster[currentPage.toString()].push(mes);
 }

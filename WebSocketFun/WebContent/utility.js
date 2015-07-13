@@ -151,9 +151,18 @@ redrawCurrentPageContents = function() {
 
 	}
 
-	for (i = 0; i < savedDrawCommandsMaster.length; i++) {
-		var drawCommand = savedDrawCommandsMaster[i];
-		drawLinesMaster(0, drawCommand.type, drawCommand.x, drawCommand.y);
+	if (typeof savedDrawCommandsMaster[currentPage.toString()] != 'undefined') {
+
+		saveDrawCommandsForCurrentPage = savedDrawCommandsMaster[currentPage
+				.toString()];
+
+		for (i = 0; i < saveDrawCommandsForCurrentPage.length; i++) {
+			
+			var drawCommand = saveDrawCommandsForCurrentPage[i];
+			drawLinesMaster(0, drawCommand.type,
+					drawCommand.x, drawCommand.y);
+		}
+
 	}
 	
 	renderPresentationPage(presentationPdf);

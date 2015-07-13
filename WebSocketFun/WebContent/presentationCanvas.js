@@ -59,10 +59,33 @@ renderPresentationPage = function(pdf) {
 }
 
 goPreviousPage = function() {
-	
+	if(currentPage > 0){
+		currentPage--;
+		redrawCurrentPageContents();
+		var mes = {
+				command : "changePage",
+				pageNum : currentPage
+			};
+		Chat.socket.send(JSON.stringify(mes));
+	}
 }
 
 goNextPage = function() {
-	
+	if(currentPage < numPresentationPages-1){
+		currentPage++;
+		redrawCurrentPageContents();
+		var mes = {
+				command : "changePage",
+				pageNum : currentPage
+			};
+		Chat.socket.send(JSON.stringify(mes));
+	}
+}
+
+changePage = function(pageNum) {
+	if(pageNum < numPresentationPages && pageNum >= 0){
+		currentPage = pageNum;
+		redrawCurrentPageContents();
+	}
 }
 

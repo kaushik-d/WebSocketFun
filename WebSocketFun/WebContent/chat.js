@@ -83,6 +83,8 @@ processCommands = function(message) {
 		finalizeCanvasSlave(mes.canvasID.trim());
 	} else if (mes.command === "textMessage") {
 		Console.log(mes.text);
+	} else if (mes.command === "changePage") {
+		changePage(mes.pageNum);
 	}
 }
 

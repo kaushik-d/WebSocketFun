@@ -28,7 +28,7 @@
 	var mySlaveID = -1;
 	var myMeeringRoomNum ="<%=(String) request.getParameter("room")%>";
 	var savedDrawCommands = {};
-	var savedDrawCommandsMaster = new Array();
+	var savedDrawCommandsMaster = {};
 	var isPresentation = false;
 	var presentationURI = "NotAPresentation";
 	var currentPage = 0;
