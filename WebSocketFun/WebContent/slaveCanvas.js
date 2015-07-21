@@ -56,7 +56,7 @@ function finalizeCanvasSlave(canvasName) {
 	var ID = parseInt(canvasName.substring(1, canvasName.length));
 	window.document.getElementById('canvasDiv')
 			.removeChild(canvasListSlave[ID]);
-	canvasListSlave[ID] = null
+	canvasListSlave[ID] = null;
 	contextListSlave[ID] = null;
 	lineStartedListSlave[ID] = false;
 	oldxListSlave[ID] = 0;

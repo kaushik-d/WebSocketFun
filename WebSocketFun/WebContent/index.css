@@ -21,9 +21,10 @@ button {
 	position: relative;
 }
 
-#Start_Action_Area {
+.Start_Action {
+	display: none;
 	width: 200px;
-	height: 65px;
+	height: 85px;
 	/*position: fixed;*/
 	margin-left: auto;
 	margin-right: auto;

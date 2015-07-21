@@ -1,5 +1,7 @@
 package websocket.chat;
 
+import java.io.InputStream;
+
 public class meetingRoomData {
 	
 	private String functName;
@@ -8,6 +10,7 @@ public class meetingRoomData {
 	String topic = "Unknown";
 	String presentationURI = "NotAPresentation";
 	String roomNumber;
+	InputStream fileContent;
 	
 	public meetingRoomData(){
 		

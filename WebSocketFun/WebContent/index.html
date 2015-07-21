@@ -4,34 +4,99 @@
 <meta charset="UTF-8">
 <title>Start Collaboration Now</title>
 <link rel="stylesheet" type="text/css" href="index.css?v=1.0">
-</head>
-<body>
-	<div id="Start_Message_Area" style="height: 50px"></div>
-	<div id="Start_div">
-		<button onmouseover="StartMessage(this)"
-			onmouseout="ClearStartMessage(this)" onclick="Start(this)">Start</button>
-	</div>
-	<div id="Start_Action_Area"></div>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
-	<div id="Share_Message_Area" style="height: 50px"></div>
-	<div id="Share_div">
-		<button onmouseover="ShareMessage(this)"
-			onmouseout="ClearShareMessage(this)">Share</button>
-	</div>
-	<div id="Share_Action_Area"></div>
-
-
-	<div id="Join_Message_Area" style="height: 50px"></div>
-	<div id="Share_div">
-		<button onmouseover="JoinMessage(this)"
-			onmouseout="ClearJoinMessage(this)" onclick="Join(this)">Join</button>
-	</div>
-	<div id="Join_Action_Area"></div>
-
-	<script>
+<script>
 		var startClicked = false;
+		var whiteboardClicked = false;
+		var presentationClicked = false;
+		
 		var meetingRoomData = {};
 		var isRoomCreated = false;
+		
+		$(document).ready(function(){
+		    $("#Start_Button").click(function(){
+		    	if(!startClicked) {
+		    		startClicked = true;
+		        	$("#Start_Action_Area").slideDown("slow");
+		    	} else if (whiteboardClicked) {
+		    		whiteboardClicked = false;
+		    		$("#Start_WhitBoard").slideUp("slow", function (){
+		    			$("#Start_Action_Area").slideDown("slow");
+		    		});
+		    		
+		    	} else if (presentationClicked) {
+		    		presentationClicked = false;
+		    		$("#Start_Presentation").slideUp("slow",function (){
+		    			$("#Start_Action_Area").slideDown("slow");
+		    		});
+		    		
+		    	}
+		    });
+		    $("#whitboard").click(function(){
+		    	whiteboardClicked = true;;
+		    	$("#Start_Action_Area").slideUp("slow", function (){
+		    		$("#Start_WhitBoard").slideDown("slow");
+		    	});
+		    });
+		    $("#presentation").click(function(){
+		    	presentationClicked = true;
+		    	$("#Start_Action_Area").slideUp("slow", function () {
+		    		$("#Start_Presentation").slideDown("slow");
+		    	});
+		    });
+		    
+		    $("#PresentationForm").submit(StartPresentation);
+		    $("#WhitboardForm").submit(StartWhiteboard);
+		    
+		});
+		
+		StartPresentation = function(evt){
+			var formElement = document.getElementById("PresentationForm");
+			var data = new FormData(formElement);
+			data.append("isPresentation","true");
+			data.append("presentationURI","NotAvailable");
+			data.append("functName","createRoom");
+			StartSubmit(evt,data);
+		}
+		
+		StartWhiteboard = function(evt){
+			var formElement = document.getElementById("WhitboardForm");
+			var data = new FormData(formElement);
+			data.append("isPresentation","false");
+			data.append("presentationURI","NotAPresentation");
+			data.append("functName","createRoom");
+			StartSubmit(evt,data);
+		}
+		
+		StartSubmit = function (evt,data){
+			var url = "login";
+
+	        $.ajax({
+	               type: "POST",
+	               url: url,
+	               data: data,
+	               cache: false,
+	               contentType: false,
+	               processData: false,
+	               success: function(data)
+	               {
+	            	   meetingRoomData = JSON.parse(xmlhttp.responseText);
+						isRoomCreated = true;
+						document.getElementById("Start_Action_Area").innerHTML = '';
+						document.getElementById("Share_Message_Area").innerHTML = "Meeting room# "
+								+ meetingRoomData.roomNumber;
+						document.getElementById("Join_Message_Area").innerHTML = "Meeting room# "
+								+ meetingRoomData.roomNumber;
+						startClicked = false;
+	               }
+	             });
+
+	        evt.preventDefault()
+	        return false; // avoid to execute the actual submit of the form.
+		}
+		
 
 		function StartMessage(startButton) {
 			var startMessageArea = document
@@ -208,6 +273,50 @@
 
 						}, false);
 	</script>
+
+</head>
+<body>
+	<div id="Start_Message_Area" style="height: 50px"></div>
+	<div id="Start_div">
+		<button onmouseover="StartMessage(this)"
+			onmouseout="ClearStartMessage(this)" id="Start_Button">Start</button>
+	</div>
+	<div id="Start_Action_Area" class="Start_Action">
+		<button id="whitboard">Start A Whitboard</button>
+		<button id="presentation">Start A Presentation</button>
+	</div>
+	<div id="Start_WhitBoard" class="Start_Action">
+		<form action="login" method="post" enctype="multipart/form-data" id="WhitboardForm">
+			<input type="text" name="topic" placeholder="Meeting topic" /> <input
+				type="text" name="name" placeholder="Your name" /> <input
+				type="submit" value="Submit">
+			<button type="reset" value="Reset">Reset</button>
+		</form>
+	</div>
+	<div id="Start_Presentation" class="Start_Action">
+		<form action="login" method="post" enctype="multipart/form-data" id="PresentationForm">
+			<input type="text" name="topic" placeholder="Meeting topic" /> <input
+				type="text" name="name" placeholder="Your name" /> <input
+				type="file" name="presentationFile" /> <input type="submit"
+				value="Submit">
+			<button type="reset" value="Reset">Reset</button>
+		</form>
+	</div>
+
+	<div id="Share_Message_Area" style="height: 50px"></div>
+	<div id="Share_div">
+		<button onmouseover="ShareMessage(this)"
+			onmouseout="ClearShareMessage(this)">Share</button>
+	</div>
+	<div id="Share_Action_Area"></div>
+
+
+	<div id="Join_Message_Area" style="height: 50px"></div>
+	<div id="Share_div">
+		<button onmouseover="JoinMessage(this)"
+			onmouseout="ClearJoinMessage(this)" onclick="Join(this)">Join</button>
+	</div>
+	<div id="Join_Action_Area"></div>
 
 </body>
 
