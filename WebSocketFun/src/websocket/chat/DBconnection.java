@@ -6,18 +6,21 @@ import java.io.InputStream;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 
 public class DBconnection {
 
-	private String dbURL = "jdbc:mysql://localhost:3306/AppDB";
-	private String dbUser = "root";
-	private String dbPass = "secret";
+	private static String dbName = "rooms";
+	private static String dbURL = "jdbc:mysql://localhost:3306/"+dbName;
+	private static String dbUser = "root";
+	private static String dbPass = "1234";
+	private static String dbTable = "roomdata";
 
 	public DBconnection() {
 
 	}
 
-	public void saveToDb() {
+	public void saveToDb(meetingRoomData roomData, InputStream fileContent) {
 		Connection conn = null; // connection to the database
 		String message = null; // message will be sent back to client
 
@@ -27,14 +30,25 @@ public class DBconnection {
 			conn = DriverManager.getConnection(dbURL, dbUser, dbPass);
 
 			// constructs SQL statement
-			String sql = "INSERT INTO contacts (first_name, last_name, photo) values (?, ?, ?)";
+			String sql = "INSERT INTO " + dbTable
+					+ " (isPresentation, host_name, meeting_topic, presentationURI,"
+					+ " roomNumber, fileContent, create_datetime, start_datetime,"
+					+ " end_datetime, IPaddress) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 			PreparedStatement statement = conn.prepareStatement(sql);
-			statement.setString(1, firstName);
-			statement.setString(2, lastName);
+			
+			statement.setBoolean(1, roomData.getisPresentation());
+			statement.setString(2, roomData.getName());
+			statement.setString(3, roomData.getTopic());
+			statement.setString(4, roomData.getPresentationURI());
+			statement.setString(5, roomData.getMeetingRoomNumber());
+			statement.setTimestamp(7, new java.sql.Timestamp(System.currentTimeMillis()));
+			statement.setNull(8, Types.TIMESTAMP);
+			statement.setNull(9, Types.TIMESTAMP);
+			statement.setString(10, roomData.getMeetingHostIP());
 
-			if (inputStream != null) {
+			if (fileContent != null) {
 				// fetches input stream of the upload file for the blob column
-				statement.setBlob(3, inputStream);
+				statement.setBlob(6, fileContent);
 			}
 
 			// sends the statement to the database server
@@ -54,12 +68,7 @@ public class DBconnection {
 					ex.printStackTrace();
 				}
 			}
-			// sets the message in request scope
-			request.setAttribute("Message", message);
 
-			// forwards to the message page
-			getServletContext().getRequestDispatcher("/Message.jsp").forward(
-					request, response);
 		}
 	}
 

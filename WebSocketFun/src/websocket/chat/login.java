@@ -45,11 +45,15 @@ public class login extends HttpServlet {
 	    	isPresentation = true;
 	    }
 	    String functName = request.getParameter("functName");
+	    String meetingHostIP = request.getRemoteAddr();
+	    String name = request.getParameter("name");
 		
 		Gson gson = new Gson();
 		
 		//meetingRoomData MeetingRoomData = gson.fromJson(json, meetingRoomData.class);
-		meetingRoomData MeetingRoomData = new meetingRoomData();
+		meetingRoomData MeetingRoomData = new meetingRoomData( functName, isPresentation,
+				 name, topic, "NotAvailable",
+				 null, meetingHostIP);
 		
 		if(MeetingRoomData.getFunction().contains("createRoom")) {
 			String roomNumber = createMeetingRoom();
